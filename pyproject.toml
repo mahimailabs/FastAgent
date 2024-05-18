@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "kurious-fastapi"
+version = "0.1.0"
+description = ""
+authors = ["Mahimai Raja J"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+fastapi = "^0.111.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
