@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any
+from typing import Any, AsyncIterator
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
@@ -108,6 +108,125 @@ class ChatService:
                 "conversation_id": thread_id,
                 "response_id": str(getattr(final_message, "id", "")),
             }
+
+    async def stream_response(
+        self, message: str, thread_id: str
+    ) -> AsyncIterator[dict[str, Any]]:
+        # asyncpg expects postgresql:// scheme
+        conn_string = self.config.SQLALCHEMY_DATABASE_URI.replace(
+            "postgresql+asyncpg://", "postgresql://"
+        )
+
+        async with AsyncPostgresSaver.from_conn_string(conn_string) as checkpointer:
+            await checkpointer.setup()
+            tools = await self._load_tools()
+
+            agent = create_agent(
+                model=self.model,
+                tools=tools,
+                checkpointer=checkpointer,
+                debug=True if self.config.DEBUG else False,
+                middleware=[
+                    SummarizationMiddleware(
+                        model=self.model,
+                        trigger=("tokens", 2000),
+                        keep=("messages", 10),
+                    ),
+                ],
+            )
+
+            token_buffer: list[str] = []
+            tool_runs: dict[str, dict[str, Any]] = {}
+            final_payload: dict[str, Any] | None = None
+
+            async for event in agent.astream_events(
+                {"messages": [{"role": "user", "content": message}]},
+                {"configurable": {"thread_id": thread_id}},
+                version="v2",
+            ):
+                event_name = event.get("event")
+
+                if event_name == "on_chat_model_stream":
+                    chunk = event.get("data", {}).get("chunk")
+                    chunk_text = self._normalize_content(
+                        getattr(chunk, "content", "") if chunk else ""
+                    )
+                    if chunk_text:
+                        token_buffer.append(chunk_text)
+                        yield {"type": "token", "content": chunk_text}
+                    continue
+
+                if event_name == "on_tool_start":
+                    run_id = str(event.get("run_id"))
+                    tool_name = str(event.get("name") or "tool")
+                    tool_input = event.get("data", {}).get("input")
+                    tool_runs[run_id] = {
+                        "id": run_id,
+                        "name": tool_name,
+                        "input": tool_input,
+                        "status": "running",
+                    }
+                    yield {
+                        "type": "tool_start",
+                        "id": run_id,
+                        "name": tool_name,
+                        "input": tool_input,
+                    }
+                    continue
+
+                if event_name == "on_tool_end":
+                    run_id = str(event.get("run_id"))
+                    tool_name = str(event.get("name") or "tool")
+                    output = event.get("data", {}).get("output")
+                    if run_id in tool_runs:
+                        tool_runs[run_id]["output"] = output
+                        tool_runs[run_id]["status"] = "completed"
+                    else:
+                        tool_runs[run_id] = {
+                            "id": run_id,
+                            "name": tool_name,
+                            "output": output,
+                            "status": "completed",
+                        }
+                    yield {
+                        "type": "tool_end",
+                        "id": run_id,
+                        "name": tool_name,
+                        "output": output,
+                    }
+                    continue
+
+                if event_name == "on_chain_end":
+                    output = event.get("data", {}).get("output")
+                    if isinstance(output, dict) and isinstance(output.get("messages"), list):
+                        messages = output["messages"]
+                        if messages:
+                            final_message = messages[-1]
+                            final_content = self._normalize_content(
+                                getattr(final_message, "content", "")
+                            )
+                            if final_content:
+                                token_buffer = [final_content]
+
+                            response_id = str(getattr(final_message, "id", ""))
+                            final_payload = {
+                                "type": "final",
+                                "content": "".join(token_buffer).strip(),
+                                "tool_calls": list(tool_runs.values()),
+                                "conversation_id": thread_id,
+                                "response_id": response_id,
+                            }
+
+            if final_payload is None:
+                final_payload = {
+                    "type": "final",
+                    "content": "".join(token_buffer).strip(),
+                    "tool_calls": list(tool_runs.values()),
+                    "conversation_id": thread_id,
+                    "response_id": "",
+                }
+
+            yield final_payload
 
     async def reset_thread(self, thread_id: str) -> None:
         try:
