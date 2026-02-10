@@ -32,6 +32,7 @@ class Config(BaseSettings):
     API_V1_STR: str = "/api/v1"
     API_STR: str = "/api"
     MCP_STR: str = "/mcp"
+    MCP_SERVER_URL: str = "http://127.0.0.1:8000/mcp"
     PROJECT_NAME: str = "Kurious FastAPI Template"
     DEBUG: Optional[bool] = None
 

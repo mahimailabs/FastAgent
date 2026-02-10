@@ -69,9 +69,9 @@ class AppCreator:
         self.app.add_middleware(CorrelationIdMiddleware)
 
         self.app.include_router(routers, prefix=config.API_STR)
-        self.app.include_router(mcps_routers)
+        self.app.include_router(mcps_routers, prefix=config.API_STR)
         mcp = FastApiMCP(self.app)
-        mcp.mount_http(mcps_routers, prefix=config.MCP_STR)
+        mcp.mount_http(mount_path=config.MCP_STR)
         self._register_exception_handlers()
 
     def _configure_monitoring(self):

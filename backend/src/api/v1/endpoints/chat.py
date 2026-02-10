@@ -19,4 +19,4 @@ async def chat(
         message=chat_request.content,
         thread_id=chat_request.conversation_id or "default",
     )
-    return {"message": response}
+    return response
