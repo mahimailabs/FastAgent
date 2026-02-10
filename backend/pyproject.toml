@@ -12,6 +12,7 @@ dependencies = [
     "asgi-correlation-id>=4.3.4",
     "asyncpg>=0.31.0",
     "dependency-injector>=4.48.3",
+    "fastapi-mcp>=0.4.0",
     "fastapi[standard]>=0.128.0",
     "greenlet>=3.3.1",
     "langchain>=1.2.10",

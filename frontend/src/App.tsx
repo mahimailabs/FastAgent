@@ -27,10 +27,24 @@ type ChatMessage = {
   tools?: ToolCall[]
 }
 
+type AssistantPayload = {
+  content?: string
+  message?: string
+  tool_calls?: unknown[]
+  steps?: unknown[]
+  response_id?: string
+  conversation_id?: string
+}
+
 function App() {
   const { getToken } = useAuth()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [latestTools, setLatestTools] = useState<ToolCall[]>([])
+  const [lastRunInfo, setLastRunInfo] = useState<{
+    conversationId?: string
+    responseId?: string
+    stepCount?: number
+  } | null>(null)
   const [input, setInput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -60,6 +74,63 @@ function App() {
               : undefined,
       }
     })
+  }
+
+  const parseAssistantPayload = (raw: Record<string, unknown>): AssistantPayload => {
+    const messageField = raw.message
+    if (typeof messageField === 'string') {
+      return {
+        content: messageField,
+        response_id: typeof raw.response_id === 'string' ? raw.response_id : undefined,
+        conversation_id:
+          typeof raw.conversation_id === 'string' ? raw.conversation_id : undefined,
+        tool_calls: Array.isArray(raw.tool_calls) ? raw.tool_calls : [],
+        steps: Array.isArray(raw.steps) ? raw.steps : [],
+      }
+    }
+
+    if (messageField && typeof messageField === 'object') {
+      const m = messageField as Record<string, unknown>
+      return {
+        content:
+          typeof m.content === 'string'
+            ? m.content
+            : typeof m.message === 'string'
+              ? m.message
+              : undefined,
+        response_id:
+          typeof m.response_id === 'string'
+            ? m.response_id
+            : typeof raw.response_id === 'string'
+              ? raw.response_id
+              : undefined,
+        conversation_id:
+          typeof m.conversation_id === 'string'
+            ? m.conversation_id
+            : typeof raw.conversation_id === 'string'
+              ? raw.conversation_id
+              : undefined,
+        tool_calls: Array.isArray(m.tool_calls)
+          ? m.tool_calls
+          : Array.isArray(raw.tool_calls)
+            ? raw.tool_calls
+            : [],
+        steps: Array.isArray(m.steps)
+          ? m.steps
+          : Array.isArray(raw.steps)
+            ? raw.steps
+            : [],
+      }
+    }
+
+    return {
+      content: typeof raw.content === 'string' ? raw.content : 'No response content',
+      tool_calls: Array.isArray(raw.tool_calls) ? raw.tool_calls : [],
+      steps: Array.isArray(raw.steps) ? raw.steps : [],
+      response_id: typeof raw.response_id === 'string' ? raw.response_id : undefined,
+      conversation_id:
+        typeof raw.conversation_id === 'string' ? raw.conversation_id : undefined,
+    }
   }
 
   const sendMessage = async () => {
@@ -95,16 +166,18 @@ function App() {
         throw new Error(`Chat request failed (${response.status}): ${text}`)
       }
 
-      const data = (await response.json()) as Record<string, unknown>
-      const parsedTools = parseToolCalls(data)
-      const assistantText =
-        typeof data.message === 'string'
-          ? data.message
-          : typeof data.content === 'string'
-            ? data.content
-            : 'No response content'
+      const raw = (await response.json()) as Record<string, unknown>
+      const payload = parseAssistantPayload(raw)
+      const payloadRecord = payload as unknown as Record<string, unknown>
+      const parsedTools = parseToolCalls(payloadRecord)
+      const assistantText = payload.content ?? 'No response content'
 
       setLatestTools(parsedTools)
+      setLastRunInfo({
+        conversationId: payload.conversation_id,
+        responseId: payload.response_id,
+        stepCount: Array.isArray(payload.steps) ? payload.steps.length : undefined,
+      })
       setMessages((prev) => [
         ...prev,
         { role: 'assistant', content: assistantText, tools: parsedTools },
@@ -201,6 +274,25 @@ function App() {
           <aside className="card tools-card">
             <h2>Tool Trail</h2>
             <p>Latest model tool calls rendered from backend response metadata.</p>
+            {lastRunInfo && (
+              <div className="run-info">
+                {lastRunInfo.conversationId && (
+                  <p>
+                    <strong>Thread:</strong> {lastRunInfo.conversationId}
+                  </p>
+                )}
+                {lastRunInfo.responseId && (
+                  <p>
+                    <strong>Run:</strong> {lastRunInfo.responseId}
+                  </p>
+                )}
+                {lastRunInfo.stepCount !== undefined && (
+                  <p>
+                    <strong>Steps:</strong> {lastRunInfo.stepCount}
+                  </p>
+                )}
+              </div>
+            )}
             {latestTools.length === 0 ? (
               <p className="muted">No tool calls yet. Response-only mode is active.</p>
             ) : (

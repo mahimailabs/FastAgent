@@ -4,10 +4,12 @@ import os
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from fastapi_mcp import FastApiMCP
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.middleware.cors import CORSMiddleware
 
+from src.api.mcps import router as mcps_routers
 from src.api.routes import routers
 from src.core.config import config
 from src.core.container import Container
@@ -67,6 +69,9 @@ class AppCreator:
         self.app.add_middleware(CorrelationIdMiddleware)
 
         self.app.include_router(routers, prefix=config.API_STR)
+        self.app.include_router(mcps_routers)
+        mcp = FastApiMCP(self.app)
+        mcp.mount_http(mcps_routers, prefix=config.MCP_STR)
         self._register_exception_handlers()
 
     def _configure_monitoring(self):

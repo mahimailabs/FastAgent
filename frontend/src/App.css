@@ -197,6 +197,20 @@
   min-height: 420px;
 }
 
+.run-info {
+  margin-bottom: 0.7rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #dbe4f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.run-info p {
+  margin: 0.2rem 0;
+  font-size: 0.82rem;
+  color: #334155;
+}
+
 .tool-list {
   display: flex;
   flex-direction: column;

@@ -31,6 +31,7 @@ class Config(BaseSettings):
     API: str = "/api"
     API_V1_STR: str = "/api/v1"
     API_STR: str = "/api"
+    MCP_STR: str = "/mcp"
     PROJECT_NAME: str = "Kurious FastAPI Template"
     DEBUG: Optional[bool] = None
 
