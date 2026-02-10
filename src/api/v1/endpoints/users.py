@@ -13,7 +13,7 @@ router = APIRouter(
     tags=["users"],
 )
 
-CurrentUser = Annotated[any, Depends(get_current_user)]
+CurrentUser = Annotated[str, Depends(get_current_user)]
 Service = Annotated[UserService, Depends(Provide[Container.user_service])]
 
 
@@ -23,7 +23,8 @@ async def read_users_me(
     current_user: CurrentUser,
     user_service: Service,
 ):
-    return await user_service.sync_supabase_user(current_user)
+    """Get the current authenticated user's profile."""
+    return await user_service.sync_clerk_user(current_user)
 
 
 @router.patch("/me", response_model=User)
@@ -33,7 +34,8 @@ async def update_user_me(
     current_user: CurrentUser,
     user_service: Service,
 ):
-    original_user = await user_service.sync_supabase_user(current_user)
+    """Update the current authenticated user's profile."""
+    original_user = await user_service.sync_clerk_user(current_user)
     return await user_service.patch(original_user.id, user_update)
 
 
@@ -43,4 +45,5 @@ async def get_users(
     current_user: CurrentUser,
     user_service: Service,
 ):
+    """Get all users (requires authentication)."""
     return await user_service.get_list()
