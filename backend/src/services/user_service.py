@@ -26,12 +26,17 @@ class UserService(BaseService):
         """
         user = await self.user_repository.get_by_clerk_id(clerk_id)
         if user:
-            # Update existing user if fields changed
-            if user.email != email or user.name != name:
+            # Only update profile fields when explicit non-null values are provided.
+            should_update = False
+            if email is not None and user.email != email:
                 user.email = email
+                should_update = True
+            if name is not None and user.name != name:
                 user.name = name
-                if user.id:
-                    await self.user_repository.update(user.id, user)
+                should_update = True
+
+            if should_update and user.id:
+                await self.user_repository.update(user.id, user)
             return user
 
         # Create new user on first login

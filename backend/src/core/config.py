@@ -50,7 +50,6 @@ class Config(BaseSettings):
     DB_NAME: str
     DB_PASSWORD: SecretStr
     DB_SSL: Optional[str] = None
-    DB_CHANNELBINDING: Optional[str] = None
     DB_FORCE_ROLL_BACK: bool = False
 
     @model_validator(mode="after")
@@ -77,9 +76,12 @@ class Config(BaseSettings):
         args: dict[str, object] = {"statement_cache_size": 0}
 
         if self.DB_SSL:
-            args["ssl"] = self.DB_SSL
-        if self.DB_CHANNELBINDING:
-            args["channel_binding"] = self.DB_CHANNELBINDING
+            ssl_mode = self.DB_SSL.strip().lower()
+            if ssl_mode in {"disable", "false", "0", "no"}:
+                args["ssl"] = False
+            else:
+                # asyncpg accepts bool/SSLContext; map common modes to enabled TLS.
+                args["ssl"] = True
 
         return args
 
