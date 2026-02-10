@@ -88,6 +88,7 @@ class Config(BaseSettings):
     # OpenAI
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_EMBEDDING_MODEL: Optional[str] = None
+    OPENAI_MODEL_NAME: Optional[str] = None
 
     # Clerk Authentication
     CLERK_JWKS_URL: str
