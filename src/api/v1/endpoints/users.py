@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 
 from src.core.container import Container
 from src.core.security import get_current_user
+from src.schemas.base_schema import Blank
 from src.schemas.user_schema import User, UserListResponse, UserUpdate
 from src.services.user_service import UserService
 
@@ -46,4 +47,4 @@ async def get_users(
     user_service: Service,
 ):
     """Get all users (requires authentication)."""
-    return await user_service.get_list()
+    return await user_service.get_list(schema=Blank())

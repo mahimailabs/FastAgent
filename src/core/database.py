@@ -20,7 +20,7 @@ class Database:
             echo_pool=config.DEBUG,
             pool_pre_ping=True,
             pool_recycle=600,
-            connect_args={"statement_cache_size": 0},
+            connect_args=config.SQLALCHEMY_CONNECT_ARGS,
         )
 
         self._session_factory = async_sessionmaker(

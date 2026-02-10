@@ -40,6 +40,8 @@ class Config(BaseSettings):
     DB_PORT: int
     DB_NAME: str
     DB_PASSWORD: str
+    DB_SSL: Optional[str] = None
+    DB_CHANNELBINDING: Optional[str] = None
     DB_FORCE_ROLL_BACK: bool = False
 
     @property
@@ -51,6 +53,17 @@ class Config(BaseSettings):
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
 
+    @property
+    def SQLALCHEMY_CONNECT_ARGS(self) -> dict[str, object]:
+        args: dict[str, object] = {"statement_cache_size": 0}
+
+        if self.DB_SSL:
+            args["ssl"] = self.DB_SSL
+        if self.DB_CHANNELBINDING:
+            args["channel_binding"] = self.DB_CHANNELBINDING
+
+        return args
+
     # OpenAI
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_EMBEDDING_MODEL: Optional[str] = None
@@ -58,6 +71,25 @@ class Config(BaseSettings):
     # Clerk Authentication
     CLERK_JWKS_URL: str
     CLERK_WEBHOOK_SECRET: Optional[str] = None
+    CLERK_ISSUER: Optional[str] = None
+    CLERK_AUDIENCE: Optional[str] = None
+    CLERK_AUTHORIZED_PARTIES: Optional[str] = None
+
+    @property
+    def CLERK_AUDIENCES(self) -> list[str]:
+        if not self.CLERK_AUDIENCE:
+            return []
+        return [aud.strip() for aud in self.CLERK_AUDIENCE.split(",") if aud.strip()]
+
+    @property
+    def CLERK_AUTHORIZED_PARTY_LIST(self) -> list[str]:
+        if not self.CLERK_AUTHORIZED_PARTIES:
+            return []
+        return [
+            party.strip()
+            for party in self.CLERK_AUTHORIZED_PARTIES.split(",")
+            if party.strip()
+        ]
 
     # find query
     PAGE: int = 1
