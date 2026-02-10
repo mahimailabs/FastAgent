@@ -8,21 +8,42 @@ class UserService(BaseService):
         self.user_repository = user_repository
         super().__init__(user_repository)
 
-    async def sync_supabase_user(self, supabase_user) -> UserDb:
+    async def sync_clerk_user(
+        self, clerk_id: str, email: str | None = None, name: str | None = None
+    ) -> UserDb:
         """
-        Syncs a Supabase user to the local database.
-        If the user exists by supabase_id, returns it.
+        Syncs a Clerk user to the local database.
+        If the user exists by clerk_id, returns it.
         Otherwise, creates a new user.
+
+        Args:
+            clerk_id: The Clerk user ID from the JWT token
+            email: Optional email from JWT token claims
+            name: Optional full name
+
+        Returns:
+            UserDb: The synced user record
         """
-        user = await self.user_repository.get_by_supabase_id(supabase_user.id)
+        user = await self.user_repository.get_by_clerk_id(clerk_id)
         if user:
+            # Update existing user if fields changed
+            if user.email != email or user.name != name:
+                user.email = email
+                user.name = name
+                if user.id:
+                    await self.user_repository.update(user.id, user)
             return user
 
-        # Create new user
+        # Create new user on first login
         new_user = UserDb(
-            supabase_id=supabase_user.id,
-            email=supabase_user.email,
-            name=supabase_user.user_metadata.get("full_name")
-            or supabase_user.user_metadata.get("name"),
+            clerk_id=clerk_id,
+            email=email,
+            name=name,
         )
         return await self.user_repository.create(new_user)
+
+    async def delete_clerk_user(self, clerk_id: str) -> None:
+        """
+        Deletes a user by their Clerk ID.
+        """
+        await self.user_repository.delete_by_clerk_id(clerk_id)

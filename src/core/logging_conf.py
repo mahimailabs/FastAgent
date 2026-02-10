@@ -71,19 +71,11 @@ def configure_logging() -> None:
                     "formatter": "console",
                     "filters": ["correlation_id", "email_obfuscation"],
                 },
-                # "logtail": {
-                #     "class": "logtail.LogtailHandler",
-                #     "host": config.LOGTAIL_HOST,
-                #     "level": "DEBUG",
-                #     "formatter": "console",
-                #     "filters": ["correlation_id", "email_obfuscation"],
-                #     "source_token": config.LOGTAIL_API_KEY,
-                # },
                 "rotating_file": {
                     "class": "logging.handlers.RotatingFileHandler",
                     "level": "DEBUG",
                     "formatter": "file",
-                    "filename": "prisma-api.log",
+                    "filename": "kurious-fastapi.log",
                     "maxBytes": 1024 * 1024 * 2,  # 2 megabytes
                     "backupCount": 5,
                     "encoding": "utf8",

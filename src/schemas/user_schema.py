@@ -16,7 +16,7 @@ class UserUpdate(UserBase):
 class User(UserBase):
     id: int
     uuid: str
-    supabase_id: Optional[str] = None
+    clerk_id: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

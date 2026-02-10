@@ -9,4 +9,6 @@ class UserDb(BaseModel, table=True):
     __tablename__ = "users"
     name: Optional[str] = Field(default=None, nullable=True)
     email: Optional[str] = Field(default=None, nullable=True)
-    supabase_id: Optional[str] = Field(default=None, nullable=True, index=True)
+    clerk_id: Optional[str] = Field(
+        default=None, nullable=True, index=True, unique=True
+    )

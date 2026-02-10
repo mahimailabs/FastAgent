@@ -55,9 +55,9 @@ class Config(BaseSettings):
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_EMBEDDING_MODEL: Optional[str] = None
 
-    # Supabase
-    SUPABASE_URL: Optional[str] = None
-    SUPABASE_KEY: Optional[str] = None
+    # Clerk Authentication
+    CLERK_JWKS_URL: str
+    CLERK_WEBHOOK_SECRET: Optional[str] = None
 
     # find query
     PAGE: int = 1
