@@ -67,7 +67,7 @@ def run_migrations_online() -> None:
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
         url=app_config.SQLALCHEMY_DATABASE_URI,
-        connect_args={"statement_cache_size": 0},
+        connect_args=app_config.SQLALCHEMY_CONNECT_ARGS,
     )
 
     async def do_run_migrations():
