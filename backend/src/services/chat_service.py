@@ -45,6 +45,36 @@ class ChatService:
             ).strip()
         return str(value)
 
+    def _json_safe(self, value: Any) -> Any:
+        if value is None or isinstance(value, (str, int, float, bool)):
+            return value
+        if isinstance(value, list):
+            return [self._json_safe(item) for item in value]
+        if isinstance(value, tuple):
+            return [self._json_safe(item) for item in value]
+        if isinstance(value, dict):
+            return {str(key): self._json_safe(item) for key, item in value.items()}
+        if hasattr(value, "model_dump"):
+            try:
+                return self._json_safe(value.model_dump())
+            except Exception:
+                return str(value)
+        return str(value)
+
+    def _sanitize_tool_input(self, value: Any) -> Any:
+        safe_value = self._json_safe(value)
+        if isinstance(safe_value, dict):
+            # LangChain tool-start payload often includes a verbose runtime object.
+            safe_value.pop("runtime", None)
+        return safe_value
+
+    def _sanitize_tool_output(self, value: Any) -> Any:
+        if isinstance(value, list) and value and isinstance(value[0], dict) and "type" in value[0]:
+            return self._normalize_content(value)
+        if hasattr(value, "content"):
+            return self._normalize_content(getattr(value, "content", ""))
+        return self._json_safe(value)
+
     def _extract_tool_calls(self, messages: list[Any]) -> list[dict[str, Any]]:
         call_map: dict[str, dict[str, Any]] = {}
 
@@ -55,14 +85,14 @@ class ChatService:
                 call_map[call_id] = {
                     "id": call_id,
                     "name": str(call.get("name") or call.get("tool") or "tool"),
-                    "input": call.get("args"),
+                    "input": self._sanitize_tool_input(call.get("args")),
                     "status": "running",
                 }
 
         for msg in messages:
             tool_call_id = getattr(msg, "tool_call_id", None)
             if tool_call_id and tool_call_id in call_map:
-                call_map[tool_call_id]["output"] = self._normalize_content(
+                call_map[tool_call_id]["output"] = self._sanitize_tool_output(
                     getattr(msg, "content", "")
                 )
                 call_map[tool_call_id]["status"] = "completed"
@@ -159,7 +189,7 @@ class ChatService:
                 if event_name == "on_tool_start":
                     run_id = str(event.get("run_id"))
                     tool_name = str(event.get("name") or "tool")
-                    tool_input = event.get("data", {}).get("input")
+                    tool_input = self._sanitize_tool_input(event.get("data", {}).get("input"))
                     tool_runs[run_id] = {
                         "id": run_id,
                         "name": tool_name,
@@ -177,7 +207,7 @@ class ChatService:
                 if event_name == "on_tool_end":
                     run_id = str(event.get("run_id"))
                     tool_name = str(event.get("name") or "tool")
-                    output = event.get("data", {}).get("output")
+                    output = self._sanitize_tool_output(event.get("data", {}).get("output"))
                     if run_id in tool_runs:
                         tool_runs[run_id]["output"] = output
                         tool_runs[run_id]["status"] = "completed"
