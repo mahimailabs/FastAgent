@@ -1,0 +1,84 @@
+_min_copier_version: "9.0.0"
+_templates_suffix: ".jinja"
+_exclude:
+  - ".git"
+  - ".DS_Store"
+  - ".venv"
+  - "__pycache__"
+  - ".pytest_cache"
+  - "backend/.env"
+  - "backend/kurious-fastapi.log"
+  - "frontend/.env"
+  - "frontend/node_modules"
+  - "frontend/dist"
+  - "README.md"
+  - "backend/.env.example"
+  - "frontend/.env.example"
+  - "backend/pyproject.toml"
+
+project_name:
+  type: str
+  default: "FastAgent"
+  help: "Human-friendly project name."
+
+project_slug:
+  type: str
+  default: "fastagent"
+  help: "Project slug used in package/repo names (lowercase letters, numbers, hyphens)."
+
+author_name:
+  type: str
+  default: "Your Name"
+  help: "Template author/maintainer name."
+
+author_email:
+  type: str
+  default: "you@example.com"
+  help: "Template author/maintainer email."
+
+github_username:
+  type: str
+  default: "yourusername"
+  help: "GitHub username or org."
+
+backend_port:
+  type: int
+  default: 8000
+  help: "Local backend port."
+
+frontend_port:
+  type: int
+  default: 5173
+  help: "Local frontend port."
+
+use_clerk:
+  type: bool
+  default: true
+  help: "Include Clerk authentication setup in docs/env examples."
+
+use_postgres:
+  type: bool
+  default: true
+  help: "Include Postgres database setup in docs/env examples."
+
+use_mcp:
+  type: bool
+  default: true
+  help: "Include MCP server setup in docs/env examples."
+
+_message_after_copy: |
+  ✅ {{ project_name }} scaffold generated.
+
+  Next steps:
+  1. cd {{ _copier_conf.dst_path }}
+  2. Backend setup:
+     - cd backend
+     - cp .env.example .env
+     - uv sync
+     - uv run alembic upgrade head
+     - uv run uvicorn main:app --reload --port {{ backend_port }}
+  3. Frontend setup:
+     - cd ../frontend
+     - cp .env.example .env
+     - npm install
+     - npm run dev -- --port {{ frontend_port }}

@@ -1,0 +1,42 @@
+[project]
+name = "{{ project_slug }}-backend"
+version = "0.0.1"
+authors = [
+    { name = "{{ author_name }}", email = "{{ author_email }}" }
+]
+description = "{{ project_name }} backend"
+readme = "README.md"
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "alembic>=1.18.1",
+    "asgi-correlation-id>=4.3.4",
+    "asyncpg>=0.31.0",
+    "dependency-injector>=4.48.3",
+    "fastapi-mcp>=0.4.0",
+    "fastapi[standard]>=0.128.0",
+    "greenlet>=3.3.1",
+    "langchain>=1.2.10",
+    "langchain-community>=0.4.1",
+    "langchain-mcp-adapters>=0.1.9",
+    "langchain-openai>=1.1.9",
+    "langgraph-checkpoint-postgres>=3.0.4",
+    "loguru>=0.7.3",
+    "opentelemetry-instrumentation-fastapi>=0.60b1",
+    "pydantic-settings>=2.12.0",
+    "pyjwt[crypto]>=2.11.0",
+    "python-json-logger>=4.0.0",
+    "sqlmodel>=0.0.31",
+    "svix>=1.84.1",
+]
+
+[tool.pyright]
+typeCheckingMode = "off" # typechecking handled by mypy
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-mock>=3.15.1",
+]
+lint = [
+    "ruff>=0.14.14",
+]

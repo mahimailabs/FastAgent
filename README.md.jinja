@@ -1,0 +1,53 @@
+# {{ project_name }}
+
+Open-source AI app boilerplate: FastAPI + LangChain Agent + React + Clerk + Neon + MCP.
+
+## Create a new project from this template
+
+```bash
+copier copy gh:{{ github_username }}/{{ project_slug }} my-ai-app
+cd my-ai-app
+```
+
+If your template repo name differs from `{{ project_slug }}`, replace the source URL accordingly.
+
+## Quick Start
+
+### 1) Backend
+
+```bash
+cd backend
+cp .env.example .env
+uv sync
+uv run alembic upgrade head
+uv run uvicorn main:app --reload --port {{ backend_port }}
+```
+
+### 2) Frontend
+
+```bash
+cd ../frontend
+cp .env.example .env
+npm install
+npm run dev -- --port {{ frontend_port }}
+```
+
+## Stack
+
+- FastAPI backend with Alembic migrations
+- LangChain agent chat endpoints (sync + streaming)
+{% if use_mcp %}
+- MCP tool integration via `fastapi-mcp`
+{% endif %}
+{% if use_clerk %}
+- Clerk authentication (frontend + backend bearer flow)
+{% endif %}
+{% if use_postgres %}
+- Postgres-ready configuration
+{% endif %}
+- React frontend with Tailwind + assistant-ui
+
+## Maintainer
+
+- {{ author_name }} ({{ author_email }})
+- GitHub: [{{ github_username }}](https://github.com/{{ github_username }})

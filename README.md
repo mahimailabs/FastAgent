@@ -1,21 +1,39 @@
-# Fast API Quick Start Template
+# FastAgent Template
 
-|   by [Mahimai Raja J](www.github.com/mahimairaja)
+Open-source AI app boilerplate with:
 
-## Installation
+- FastAPI backend
+- LangChain agent chat endpoints (sync + streaming)
+- React + Tailwind + assistant-ui frontend
+- Clerk auth ready
+- Postgres ready
+- MCP ready
+
+## Use this template with Copier
+
+Install Copier:
 
 ```bash
-
-$ poetry intsall
+pipx install copier
 ```
 
-## Usage 
-
-1. Modify the variables in the `.env` file and `main.py`. And run the following command to start the server.
+Generate a new project:
 
 ```bash
-uvicorn main:app --reload
+copier copy . ../my-fastagent-app
 ```
 
--------------------
-# Thanks for using this template. 
+Or from GitHub:
+
+```bash
+copier copy gh:mahimailabs/fastagent my-fastagent-app
+```
+
+## Maintainer Notes
+
+- Template config: `/Users/mahimai/code/year-2026/JAN/fastagent/copier.yml`
+- Templated files use `.jinja` suffix:
+  - `/Users/mahimai/code/year-2026/JAN/fastagent/README.md.jinja`
+  - `/Users/mahimai/code/year-2026/JAN/fastagent/backend/.env.example.jinja`
+  - `/Users/mahimai/code/year-2026/JAN/fastagent/frontend/.env.example.jinja`
+  - `/Users/mahimai/code/year-2026/JAN/fastagent/backend/pyproject.toml.jinja`
