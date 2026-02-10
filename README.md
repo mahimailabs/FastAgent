@@ -1,5 +1,7 @@
 # FastAgent Template
 
+![FastAgent Logo](assets/logo.png)
+
 Open-source AI app boilerplate with:
 
 - FastAPI backend

@@ -7,11 +7,13 @@ html {
 }
 
 body {
-  @apply m-0 min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+  @apply m-0 min-h-screen bg-slate-950 text-slate-100 antialiased;
   background-image:
-    radial-gradient(circle at 10% 0%, rgba(124, 58, 237, 0.14), transparent 38%),
-    radial-gradient(circle at 90% 15%, rgba(14, 165, 233, 0.12), transparent 32%),
-    radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.10), transparent 35%);
+    radial-gradient(circle at 12% 2%, rgba(103, 56, 186, 0.32), transparent 33%),
+    radial-gradient(circle at 85% 12%, rgba(250, 125, 102, 0.24), transparent 36%),
+    radial-gradient(circle at 60% 100%, rgba(43, 167, 245, 0.14), transparent 32%),
+    linear-gradient(120deg, #070b2a 0%, #060f35 44%, #001a3d 100%);
+  color: #e6ebff;
 }
 
 #root {

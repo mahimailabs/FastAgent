@@ -1,0 +1,48 @@
+name: Template Smoke Test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  copier-render:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Copier
+        run: python -m pip install --upgrade pip copier
+
+      - name: Render template (defaults)
+        run: |
+          set -euo pipefail
+          DEST="$(mktemp -d)"
+          echo "DEST=${DEST}" >> "$GITHUB_ENV"
+          copier copy . "${DEST}" --defaults --vcs-ref HEAD
+
+      - name: Validate generated scaffold
+        run: |
+          set -euo pipefail
+
+          test -f "${DEST}/README.md"
+          test -f "${DEST}/backend/.env.example"
+          test -f "${DEST}/frontend/.env.example"
+          test -f "${DEST}/backend/pyproject.toml"
+
+          if grep -R "{{" "${DEST}/README.md" "${DEST}/backend/.env.example" "${DEST}/frontend/.env.example" "${DEST}/backend/pyproject.toml"; then
+            echo "Found unresolved template placeholders in rendered output."
+            exit 1
+          fi
+
+          grep -q '^name = "fastagent-backend"' "${DEST}/backend/pyproject.toml"
+          grep -q '^VITE_API_BASE_URL=http://localhost:8000$' "${DEST}/frontend/.env.example"
+

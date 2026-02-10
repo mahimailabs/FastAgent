@@ -1,5 +1,7 @@
 # Frontend (React + Clerk)
 
+![FastAgent Logo](public/logo.png)
+
 This frontend uses Clerk for authentication and calls the FastAPI backend with a Clerk bearer token.
 
 ## 1) Configure environment

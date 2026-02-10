@@ -36,6 +36,10 @@ import {
 } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 import { useMemo, useState } from 'react'
+import { Badge } from './components/ui/badge'
+import { Button, buttonVariants } from './components/ui/button'
+import { Card, CardTitle } from './components/ui/card'
+import { cn } from './lib/utils'
 
 type AppProps = {
   clerkEnabled: boolean
@@ -78,28 +82,28 @@ const features: Feature[] = [
     title: 'LangChain Agent',
     description:
       'Pre-wired chat endpoint with create_react_agent. Plug in your tools and go.',
-    accent: 'from-violet-500 to-indigo-500',
+    accent: 'from-[#7f56d9] to-[#5f64ff]',
   },
   {
     icon: PlugZap,
     title: 'MCP Server Built-in',
     description:
       'FastAPI endpoints auto-exposed as MCP tools via fastapi-mcp. Ready for MCP clients.',
-    accent: 'from-emerald-500 to-teal-500',
+    accent: 'from-[#2dd4bf] to-[#22d3ee]',
   },
   {
     icon: KeyRound,
     title: 'Auth Ready',
     description:
       'Clerk auth integrated end-to-end with protected routes and DB-linked user IDs.',
-    accent: 'from-sky-500 to-cyan-500',
+    accent: 'from-[#4bb8ff] to-[#2f8cff]',
   },
   {
     icon: DatabaseZap,
     title: 'Postgres',
     description:
       'Serverless Postgres with migrations and pooling pre-configured for production.',
-    accent: 'from-orange-400 to-rose-500',
+    accent: 'from-[#ff8f72] to-[#ff6f91]',
   },
 ]
 
@@ -248,7 +252,7 @@ function Section({
 function UserMessage() {
   return (
     <MessagePrimitive.Root className="flex justify-end">
-      <div className="max-w-[85%] rounded-2xl rounded-br-md bg-violet-600 px-4 py-2 text-sm text-white">
+      <div className="max-w-[85%] rounded-2xl rounded-br-md bg-gradient-to-r from-[#7f56d9] to-[#fa7d66] px-4 py-2 text-sm text-white">
         <MessagePrimitive.Parts
           components={{
             Text: ({ text }) => <p className="whitespace-pre-wrap">{text}</p>,
@@ -270,15 +274,15 @@ function ToolPart({
 }) {
   const isRunning = result === undefined
   return (
-    <div className="mb-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs dark:border-amber-500/30 dark:bg-amber-500/10">
-      <p className="font-semibold text-amber-800 dark:text-amber-200">
+    <div className="mb-2 rounded-xl border border-[#503f9e] bg-[#1a1b4f] px-3 py-2 text-xs">
+      <p className="font-semibold text-[#ffb4a3]">
         Tool: {toolName} {isRunning ? '(running...)' : '(completed)'}
       </p>
-      <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-amber-900/90 dark:text-amber-100/90">
+      <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-[#d8dbff]">
         {argsText}
       </pre>
       {result !== undefined ? (
-        <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-lg bg-white/80 p-2 text-slate-700 dark:bg-slate-900/60 dark:text-slate-200">
+        <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-lg bg-[#10163e] p-2 text-[#cdd6ff]">
           {typeof result === 'string' ? result : JSON.stringify(result, null, 2)}
         </pre>
       ) : null}
@@ -289,11 +293,11 @@ function ToolPart({
 function AssistantMessage() {
   return (
     <MessagePrimitive.Root className="flex justify-start">
-      <div className="max-w-[92%] rounded-2xl rounded-bl-md bg-white px-4 py-3 text-sm text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-100">
+      <div className="max-w-[92%] rounded-2xl rounded-bl-md border border-[#2b3f70] bg-[#172345] px-4 py-3 text-sm text-[#e4e8ff] shadow-sm">
         <MessagePrimitive.Parts
           components={{
             Text: () => (
-              <MarkdownTextPrimitive className="prose prose-sm max-w-none prose-slate dark:prose-invert" />
+              <MarkdownTextPrimitive className="prose prose-sm max-w-none prose-invert prose-p:text-[#e4e8ff] prose-strong:text-white prose-code:text-[#8dc3ff]" />
             ),
             tools: {
               Fallback: ({ toolName, argsText, result }) => (
@@ -438,18 +442,19 @@ function AssistantChat() {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="rounded-3xl border border-slate-200 bg-white p-4 shadow-soft dark:border-slate-800 dark:bg-slate-900">
+      <div className="rounded-3xl border border-[#2d3a72] bg-[#0d1539]/90 p-4 shadow-soft">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white">FastAgent Workspace</h3>
-          <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-800 dark:bg-violet-500/20 dark:text-violet-200">
+          <h3 className="text-lg font-bold text-[#ff8f72]">FastAgent Workspace</h3>
+          <Badge variant="warning" className="normal-case tracking-normal">
             {status}
-          </span>
+          </Badge>
         </div>
 
-        <ThreadPrimitive.Root className="flex h-[560px] flex-col rounded-2xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/70">
+        <ThreadPrimitive.Root className="flex h-[560px] flex-col rounded-2xl border border-[#34457a] bg-[#081334]/75 p-3">
           <ThreadPrimitive.Viewport className="flex-1 space-y-3 overflow-y-auto pr-1">
             <ThreadPrimitive.Empty>
-              <div className="mx-auto mt-10 max-w-md rounded-2xl border border-dashed border-violet-300 bg-violet-50 p-4 text-center text-sm text-violet-800 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-200">
+              <div className="mx-auto mt-8 max-w-md rounded-2xl border border-dashed border-[#4d5aa0] bg-[#171d4b]/85 p-4 text-center text-sm text-[#d7ddff]">
+                <img src="/cat.png" alt="FastAgent mascot" className="mx-auto mb-2 h-14 w-14" />
                 Ask a question to test your LangChain agent + MCP tools.
               </div>
             </ThreadPrimitive.Empty>
@@ -461,12 +466,12 @@ function AssistantChat() {
             />
           </ThreadPrimitive.Viewport>
 
-          <ComposerPrimitive.Root className="mt-3 flex items-end gap-2 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-700 dark:bg-slate-900">
+          <ComposerPrimitive.Root className="mt-3 flex items-end gap-2 rounded-xl border border-[#324278] bg-[#0d193f] p-2">
             <ComposerPrimitive.Input
-              className="min-h-[48px] flex-1 resize-none rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-slate-800 outline-none focus:border-violet-300 dark:text-slate-100 dark:focus:border-violet-500/50"
+              className="min-h-[48px] flex-1 resize-none rounded-lg border border-transparent bg-transparent px-3 py-2 text-sm text-[#ecf0ff] outline-none focus:border-[#7f56d9]"
               placeholder="Ask FastAgent anything..."
             />
-            <ComposerPrimitive.Send className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-60">
+            <ComposerPrimitive.Send className="rounded-lg bg-gradient-to-r from-[#7f56d9] to-[#fa7d66] px-4 py-2 text-sm font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60">
               Send
             </ComposerPrimitive.Send>
           </ComposerPrimitive.Root>
@@ -490,22 +495,23 @@ function App({ clerkEnabled }: AppProps) {
     <div className="relative overflow-x-clip">
       <div className="grain-overlay pointer-events-none absolute inset-0 opacity-80" />
 
-      <header className="sticky top-0 z-30 border-b border-white/50 bg-white/70 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/70">
+      <header className="sticky top-0 z-30 border-b border-[#29376d] bg-[#060e2f]/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3">
-          <a href="#hero" className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
-            FastAgent
+          <a href="#hero" className="inline-flex items-center gap-2">
+            <img src="/logo.png" alt="FastAgent logo" className="h-8 w-auto md:h-9" />
+            <span className="sr-only">FastAgent</span>
           </a>
-          <nav className="hidden items-center gap-5 text-sm text-slate-600 md:flex dark:text-slate-300">
-            <a href="#features" className="hover:text-slate-900 dark:hover:text-white">
+          <nav className="hidden items-center gap-5 text-sm text-[#b7c0ea] md:flex">
+            <a href="#features" className="hover:text-white">
               Features
             </a>
-            <a href="#stack" className="hover:text-slate-900 dark:hover:text-white">
+            <a href="#stack" className="hover:text-white">
               Stack
             </a>
-            <a href="#quickstart" className="hover:text-slate-900 dark:hover:text-white">
+            <a href="#quickstart" className="hover:text-white">
               Quick Start
             </a>
-            <a href="#app" className="hover:text-slate-900 dark:hover:text-white">
+            <a href="#app" className="hover:text-white">
               App
             </a>
           </nav>
@@ -514,9 +520,9 @@ function App({ clerkEnabled }: AppProps) {
               <>
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <button className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                    <Button variant="secondary" size="sm">
                       Sign in
-                    </button>
+                    </Button>
                   </SignInButton>
                 </SignedOut>
                 <SignedIn>
@@ -532,7 +538,10 @@ function App({ clerkEnabled }: AppProps) {
               href={githubUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+              className={cn(
+                buttonVariants({ variant: 'outline', size: 'sm' }),
+                'rounded-full border-[#324278] bg-[#0d173f] text-[#d7deff]',
+              )}
             >
               <Github className="h-4 w-4" />
               GitHub
@@ -544,25 +553,28 @@ function App({ clerkEnabled }: AppProps) {
       <main className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10">
         <Section id="hero" className="grid items-start gap-8 lg:grid-cols-[1.08fr_0.92fr]">
           <div>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-violet-700 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-200">
+            <Badge className="mb-3">
               <Rocket className="h-3.5 w-3.5" />
               Open-Source AI Boilerplate
-            </p>
-            <h1 className="max-w-xl text-4xl font-black leading-tight text-slate-900 md:text-5xl dark:text-white">
+            </Badge>
+            <h1 className="max-w-xl text-4xl font-black leading-tight text-white md:text-5xl">
               Ship AI Apps,
-              <span className="bg-gradient-to-r from-violet-600 via-indigo-600 to-sky-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#7f56d9] via-[#6f7cff] to-[#fa7d66] bg-clip-text text-transparent">
                 {' '}
                 Not Boilerplate
               </span>
             </h1>
-            <p className="mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
+            <p className="mt-4 max-w-2xl text-lg text-[#bfc7eb]">
               FastAgent bundles FastAPI, LangChain Agent, React, Clerk Auth, Postgres DB, and MCP
               server wiring so you can launch useful AI workflows on day one.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <a
                 href="#quickstart"
-                className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-3 text-sm font-bold text-white shadow-soft transition hover:-translate-y-0.5 hover:bg-violet-700"
+                className={cn(
+                  buttonVariants({ variant: 'default', size: 'lg' }),
+                  'shadow-soft hover:-translate-y-0.5',
+                )}
               >
                 Get Started
                 <Rocket className="h-4 w-4" />
@@ -571,16 +583,19 @@ function App({ clerkEnabled }: AppProps) {
                 <>
                   <SignedOut>
                     <SignUpButton mode="modal">
-                      <button className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                      <Button variant="secondary" size="lg" className="hover:-translate-y-0.5">
                         Sign up
                         <KeyRound className="h-4 w-4" />
-                      </button>
+                      </Button>
                     </SignUpButton>
                   </SignedOut>
                   <SignedIn>
                     <a
                       href="#app"
-                      className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                      className={cn(
+                        buttonVariants({ variant: 'secondary', size: 'lg' }),
+                        'hover:-translate-y-0.5',
+                      )}
                     >
                       Open App
                       <ExternalLink className="h-4 w-4" />
@@ -595,75 +610,77 @@ function App({ clerkEnabled }: AppProps) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-violet-200 bg-white p-4 shadow-soft dark:border-violet-500/30 dark:bg-slate-900">
+          <div className="relative rounded-2xl border border-[#40509a] bg-[#0d173e]/85 p-4 shadow-soft">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">Live Chat Demo</p>
-              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300">
+              <p className="text-sm font-semibold text-[#ecf0ff]">Live Chat Demo</p>
+              <Badge variant="success" className="normal-case tracking-normal">
                 stream
-              </span>
+              </Badge>
             </div>
-            <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-950/70">
-              <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-violet-600 px-3 py-2 text-sm text-white">
+            <div className="space-y-3 rounded-xl border border-[#324278] bg-[#070f2c] p-3">
+              <div className="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-gradient-to-r from-[#7f56d9] to-[#9258ff] px-3 py-2 text-sm text-white">
                 Find all users who signed in this week and summarize trends.
               </div>
-              <div className="w-fit max-w-[88%] rounded-2xl rounded-bl-md bg-white px-3 py-2 text-sm text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-200">
+              <div className="w-fit max-w-[88%] rounded-2xl rounded-bl-md bg-[#232f4d] px-3 py-2 text-sm text-[#dde4ff] shadow-sm">
                 Running MCP tools:
                 <br />
-                <span className="text-xs text-slate-500 dark:text-slate-400">
+                <span className="text-xs text-[#98a6d8]">
                   • users.query_by_date
                   <br />• analytics.summarize_activity
                 </span>
               </div>
-              <div className="w-fit max-w-[88%] rounded-2xl rounded-bl-md bg-white px-3 py-2 text-sm text-slate-700 shadow-sm dark:bg-slate-800 dark:text-slate-200">
+              <div className="w-fit max-w-[88%] rounded-2xl rounded-bl-md bg-[#232f4d] px-3 py-2 text-sm text-[#dde4ff] shadow-sm">
                 You had 128 active users (+18% WoW). Peak sign-ins happened around 9 AM UTC.
               </div>
-              <div className="inline-flex items-center gap-1 rounded-full bg-slate-200 px-3 py-1 dark:bg-slate-700">
-                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-slate-500 [animation-delay:-0.2s]" />
-                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-slate-500 [animation-delay:-0.1s]" />
-                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-slate-500" />
+              <div className="inline-flex items-center gap-1 rounded-full bg-[#2e3c61] px-3 py-1">
+                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-[#9da9d6] [animation-delay:-0.2s]" />
+                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-[#9da9d6] [animation-delay:-0.1s]" />
+                <span className="h-1.5 w-1.5 animate-blink rounded-full bg-[#9da9d6]" />
               </div>
             </div>
-            <div className="mt-3 flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
-              <Bot className="h-4 w-4 text-violet-500" />
+            <div className="mt-3 flex items-center gap-2 rounded-lg border border-[#34457a] bg-[#111c43] px-3 py-2 text-sm text-[#9eabdc]">
+              <Bot className="h-4 w-4 text-[#8a6cff]" />
               Ask FastAgent anything...
             </div>
           </div>
         </Section>
 
         <Section id="features" className="mt-20">
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-black text-white">
             Everything You Need, Nothing You Don&apos;t
           </h2>
           <div className="mt-7 grid gap-4 md:grid-cols-2">
             {features.map((item) => (
-              <motion.article
+              <motion.div
                 key={item.title}
                 whileHover={{ y: -4 }}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition dark:border-slate-800 dark:bg-slate-900"
+                className="transition"
               >
-                <div
-                  className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r ${item.accent} text-white`}
-                >
-                  <item.icon className="h-5 w-5" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{item.title}</h3>
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{item.description}</p>
-              </motion.article>
+                <Card className="p-5 shadow-sm">
+                  <div
+                    className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-r ${item.accent} text-white`}
+                  >
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <CardTitle>{item.title}</CardTitle>
+                  <p className="mt-2 text-sm text-[#b8c3ea]">{item.description}</p>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </Section>
 
         <Section id="stack" className="mt-20">
-          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#97a8e0]">
             Built with
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             {techStack.map((item) => (
               <div
                 key={item.label}
-                className="inline-flex animate-floaty items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                className="inline-flex animate-floaty items-center gap-2 rounded-full border border-[#34457a] bg-[#111b42] px-4 py-2 text-sm font-semibold text-[#d6ddff]"
               >
-                <item.icon className="h-4 w-4 text-violet-500" />
+                <item.icon className="h-4 w-4 text-[#ff8f72]" />
                 {item.label}
               </div>
             ))}
@@ -671,68 +688,70 @@ function App({ clerkEnabled }: AppProps) {
         </Section>
 
         <Section id="quickstart" className="mt-20">
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-black text-white">
             Up and Running in 3 Steps
           </h2>
           <div className="mt-7 space-y-4">
             {quickSteps.map((step, idx) => (
-              <article
+              <Card
                 key={step.title}
-                className="rounded-2xl border border-slate-800 bg-slate-950 p-4 text-slate-100"
+                className="border-[#34457a] bg-[#0a1233] p-4 text-slate-100"
               >
                 <div className="mb-2 flex items-center justify-between">
                   <p className="font-semibold">
-                    <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-500 text-xs font-black">
+                    <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-[#7f56d9] to-[#fa7d66] text-xs font-black">
                       {idx + 1}
                     </span>
                     {step.title}
                   </p>
-                  <button
+                  <Button
                     onClick={() => void copyCode(step.code)}
-                    className="inline-flex items-center gap-1 rounded-lg border border-slate-700 px-2.5 py-1 text-xs font-medium text-slate-300 transition hover:border-slate-500 hover:text-white"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 border-[#405092] px-2.5 text-xs text-[#c8d1fb] hover:border-[#7182c5] hover:text-white"
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                     {copied === step.code ? 'Copied' : 'Copy'}
-                  </button>
+                  </Button>
                 </div>
-                <pre className="overflow-x-auto rounded-xl bg-slate-900 p-3 text-sm leading-relaxed text-sky-200">
+                <pre className="overflow-x-auto rounded-xl bg-[#020a26] p-3 text-sm leading-relaxed text-[#8dc3ff]">
                   <code>{step.code}</code>
                 </pre>
-              </article>
+              </Card>
             ))}
           </div>
         </Section>
 
         <Section className="mt-20">
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white">Architecture</h2>
-          <div className="mt-6 grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:grid-cols-3 dark:border-slate-800 dark:bg-slate-900">
-            <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 dark:border-sky-500/40 dark:bg-sky-500/10">
-              <p className="font-bold text-sky-800 dark:text-sky-300">React Frontend</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Assistant UI + Clerk</p>
+          <h2 className="text-3xl font-black text-white">Architecture</h2>
+          <div className="mt-6 grid gap-4 rounded-3xl border border-[#34457a] bg-[#0d173e]/85 p-5 shadow-sm md:grid-cols-3">
+            <div className="rounded-2xl border border-[#2d7ab3] bg-[#103258]/70 p-4">
+              <p className="font-bold text-[#9bdeff]">React Frontend</p>
+              <p className="mt-1 text-sm text-[#c7def5]">Assistant UI + Clerk</p>
             </div>
-            <div className="rounded-2xl border border-violet-200 bg-violet-50 p-4 dark:border-violet-500/40 dark:bg-violet-500/10">
-              <p className="font-bold text-violet-800 dark:text-violet-300">FastAPI Backend</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">LangChain agent endpoints</p>
+            <div className="rounded-2xl border border-[#5b4caf] bg-[#281f62]/70 p-4">
+              <p className="font-bold text-[#d6cbff]">FastAPI Backend</p>
+              <p className="mt-1 text-sm text-[#cfc7f7]">LangChain agent endpoints</p>
             </div>
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-500/40 dark:bg-emerald-500/10">
-              <p className="font-bold text-emerald-800 dark:text-emerald-300">MCP + Tools</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">fastapi-mcp mounted server</p>
+            <div className="rounded-2xl border border-[#278f7d] bg-[#0b4a4b]/70 p-4">
+              <p className="font-bold text-[#8af0e2]">MCP + Tools</p>
+              <p className="mt-1 text-sm text-[#b4ebdf]">fastapi-mcp mounted server</p>
             </div>
 
-            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-500/40 dark:bg-amber-500/10">
-              <p className="font-bold text-amber-800 dark:text-amber-300">Clerk Auth</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">sessions + protected routes</p>
+            <div className="rounded-2xl border border-[#c05a6b] bg-[#5f2741]/70 p-4">
+              <p className="font-bold text-[#ffb5c2]">Clerk Auth</p>
+              <p className="mt-1 text-sm text-[#ffd0d8]">sessions + protected routes</p>
             </div>
-            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-500/40 dark:bg-indigo-500/10 md:col-span-2">
-              <p className="font-bold text-indigo-800 dark:text-indigo-300">Postgres</p>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">user data + thread memory + checkpoints</p>
+            <div className="rounded-2xl border border-[#f58e73] bg-[#5e2f41]/70 p-4 md:col-span-2">
+              <p className="font-bold text-[#ffc4b4]">Postgres</p>
+              <p className="mt-1 text-sm text-[#ffd8cd]">user data + thread memory + checkpoints</p>
             </div>
           </div>
         </Section>
 
         <Section id="app" className="mt-20">
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white">App</h2>
-          <p className="mt-2 text-slate-600 dark:text-slate-300">
+          <h2 className="text-3xl font-black text-white">App</h2>
+          <p className="mt-2 text-[#bac5ef]">
             Sign in to use the real assistant workspace connected to your FastAPI stream endpoint.
           </p>
 
@@ -740,23 +759,24 @@ function App({ clerkEnabled }: AppProps) {
             {clerkEnabled ? (
               <>
                 <SignedOut>
-                  <div className="rounded-2xl border border-slate-200 bg-white p-6 text-center dark:border-slate-800 dark:bg-slate-900">
-                    <p className="text-slate-700 dark:text-slate-200">
+                  <Card className="border-[#3a4a86] bg-[#0f1940]/90 p-6 text-center">
+                    <img src="/cat.png" alt="FastAgent mascot" className="mx-auto mb-3 h-16 w-16" />
+                    <p className="text-[#dce3ff]">
                       You are signed out. Sign in or create an account to continue.
                     </p>
                     <div className="mt-4 flex justify-center gap-3">
                       <SignInButton mode="modal">
-                        <button className="rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-700">
+                        <Button>
                           Sign in
-                        </button>
+                        </Button>
                       </SignInButton>
                       <SignUpButton mode="modal">
-                        <button className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
+                        <Button variant="secondary">
                           Sign up
-                        </button>
+                        </Button>
                       </SignUpButton>
                     </div>
-                  </div>
+                  </Card>
                 </SignedOut>
                 <SignedIn>
                   <AssistantChat />
