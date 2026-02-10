@@ -35,7 +35,7 @@ class JWKSCache:
 
         # Fetch new keys
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(timeout=10.0) as client:
                 response = await client.get(self.jwks_url)
                 response.raise_for_status()
                 jwks_data = response.json()
@@ -118,19 +118,42 @@ async def verify_clerk_token(token: str) -> dict[str, Any]:
         public_key = RSAAlgorithm.from_jwk(jwk)
 
         # Verify and decode the token
+        audiences = config.CLERK_AUDIENCES
+        decode_options = {
+            "verify_signature": True,
+            "verify_exp": True,
+            "verify_iat": True,
+            "verify_iss": bool(config.CLERK_ISSUER),
+            "verify_aud": bool(audiences),
+        }
+        decode_kwargs: dict[str, Any] = {}
+        if config.CLERK_ISSUER:
+            decode_kwargs["issuer"] = config.CLERK_ISSUER
+        if audiences:
+            decode_kwargs["audience"] = audiences if len(audiences) > 1 else audiences[0]
+
         decoded = jwt.decode(
             token,
             public_key,
             algorithms=["RS256"],
-            options={
-                "verify_signature": True,
-                "verify_exp": True,
-                "verify_iat": True,
-            },
+            options=decode_options,
+            **decode_kwargs,
         )
+
+        authorized_parties = config.CLERK_AUTHORIZED_PARTY_LIST
+        if authorized_parties:
+            azp = decoded.get("azp")
+            if azp not in authorized_parties:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid token: unauthorized party",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
 
         return decoded
 
+    except HTTPException:
+        raise
     except jwt.ExpiredSignatureError:
         logger.warning("Token verification failed: token expired")
         raise HTTPException(
