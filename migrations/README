@@ -1,1 +1,25 @@
-Generic single-database configuration.
+# Alembic Database Migrations
+
+Hi, the initial migration has been created. You can run the following commands to apply the migration:
+
+```bash
+alembic upgrade head
+```
+
+And if you want to create a new migration, you can run the following command:
+
+```bash
+alembic revision --autogenerate -m "message"
+
+# This will create a new migration file in the migrations/versions directory.
+
+# After you have made the necessary changes to the migration file, you can run the following command:
+
+alembic upgrade head
+```
+
+And if you want to downgrade the database, you can run the following command:
+
+```bash
+alembic downgrade -1
+```
