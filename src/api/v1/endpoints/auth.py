@@ -28,7 +28,8 @@ async def clerk_webhook(
     Handle Clerk webhooks for user lifecycle events.
     Verifies the webhook signature using Svix and syncs the user to the database.
     """
-    if not config.CLERK_WEBHOOK_SECRET:
+    webhook_secret = config.CLERK_WEBHOOK_SECRET_VALUE
+    if not webhook_secret:
         logger.warning("CLERK_WEBHOOK_SECRET is not set, ignoring webhook")
         return {"status": "ignored", "reason": "secret_not_set"}
 
@@ -42,7 +43,7 @@ async def clerk_webhook(
 
     # Verify the signature
     try:
-        wh = Webhook(config.CLERK_WEBHOOK_SECRET)
+        wh = Webhook(webhook_secret)
         evt = wh.verify(payload, headers)
     except WebhookVerificationError as e:
         logger.error(f"Webhook verification failed: {e}")
