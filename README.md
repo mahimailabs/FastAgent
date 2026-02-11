@@ -31,6 +31,20 @@ Or from GitHub:
 copier copy gh:mahimailabs/fastagent my-fastagent-app
 ```
 
+## Docker Compose Quick Start
+
+```bash
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+docker compose up --build
+```
+
+App URLs:
+
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:8000`
+- Postgres: `localhost:5432`
+
 ## Maintainer Notes
 
 - Template config: `/Users/mahimai/code/year-2026/JAN/fastagent/copier.yml`

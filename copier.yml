@@ -71,14 +71,8 @@ _message_after_copy: |
 
   Next steps:
   1. cd {{ _copier_conf.dst_path }}
-  2. Backend setup:
-     - cd backend
-     - cp .env.example .env
-     - uv sync
-     - uv run alembic upgrade head
-     - uv run uvicorn main:app --reload --port {{ backend_port }}
-  3. Frontend setup:
-     - cd ../frontend
-     - cp .env.example .env
-     - npm install
-     - npm run dev -- --port {{ frontend_port }}
+  2. Configure env files:
+     - cp backend/.env.example backend/.env
+     - cp frontend/.env.example frontend/.env
+  3. Start with Docker:
+     - docker compose up --build

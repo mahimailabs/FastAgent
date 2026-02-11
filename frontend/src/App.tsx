@@ -118,16 +118,16 @@ const techStack = [
 
 const quickSteps = [
   {
-    title: 'Clone',
-    code: 'git clone https://github.com/yourusername/fastagent && cd fastagent',
+    title: 'Scaffold',
+    code: 'copier copy gh:mahimailabs/fastagent my-fastagent-app && cd my-fastagent-app',
   },
   {
     title: 'Configure',
-    code: 'cp .env.example .env  # Add your Clerk + Postgres + LLM API keys',
+    code: 'cp backend/.env.example backend/.env && cp frontend/.env.example frontend/.env',
   },
   {
     title: 'Launch',
-    code: 'docker-compose up  # Backend, frontend, and MCP server — all running',
+    code: 'docker compose up --build  # Frontend, backend, and Postgres',
   },
 ]
 

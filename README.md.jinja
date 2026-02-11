@@ -15,23 +15,24 @@ If your template repo name differs from `{{ project_slug }}`, replace the source
 
 ## Quick Start
 
-### 1) Backend
+### 1) Copier Scaffold
 
 ```bash
-cd backend
-cp .env.example .env
-uv sync
-uv run alembic upgrade head
-uv run uvicorn main:app --reload --port {{ backend_port }}
+copier copy gh:{{ github_username }}/{{ project_slug }} my-ai-app
+cd my-ai-app
 ```
 
-### 2) Frontend
+### 2) Configure
 
 ```bash
-cd ../frontend
-cp .env.example .env
-npm install
-npm run dev -- --port {{ frontend_port }}
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+```
+
+### 3) Launch (Docker Compose)
+
+```bash
+docker compose up --build
 ```
 
 ## Stack
