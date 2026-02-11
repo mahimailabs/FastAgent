@@ -554,8 +554,9 @@ function App({ clerkEnabled }: AppProps) {
         <Section id="hero" className="grid items-start gap-8 lg:grid-cols-[1.08fr_0.92fr]">
           <div>
             <Badge className="mb-3">
-              <Rocket className="h-3.5 w-3.5" />
-              Open-Source AI Boilerplate
+              <Rocket className="h-3.5 w-3.5" /> 
+              &nbsp;
+               Open-Source AI Starter
             </Badge>
             <h1 className="max-w-xl text-4xl font-black leading-tight text-white md:text-5xl">
               Ship AI Apps,

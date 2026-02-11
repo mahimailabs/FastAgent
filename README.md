@@ -1,8 +1,6 @@
-# FastAgent Template
-
 ![FastAgent Logo](assets/logo.png)
 
-Open-source AI app boilerplate with:
+Open-source AI app starter with:
 
 - FastAPI backend
 - LangChain agent chat endpoints (sync + streaming)
