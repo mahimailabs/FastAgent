@@ -19,6 +19,11 @@ class EnvironmentOption(str, Enum):
     PROD = "prod"
 
 
+class LLMProvider(str, Enum):
+    OPENAI = "openai"
+    HUGGINGFACE = "huggingface"
+
+
 class Config(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -87,10 +92,12 @@ class Config(BaseSettings):
 
         return args
 
-    # OpenAI
-    OPENAI_API_KEY: Optional[str] = None
-    OPENAI_EMBEDDING_MODEL: Optional[str] = None
-    OPENAI_MODEL_NAME: Optional[str] = None
+    # LLM Configs
+    LLM_PROVIDER: LLMProvider = LLMProvider.OPENAI
+    MODEL_NAME: Optional[str] = None
+
+    OPENAI_API_KEY: Optional[SecretStr] = None
+    HUGGINGFACE_API_TOKEN: Optional[SecretStr] = None
 
     # Clerk Authentication
     CLERK_JWKS_URL: str

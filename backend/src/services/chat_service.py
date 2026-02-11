@@ -1,15 +1,14 @@
 import logging
-import os
 from typing import Any, AsyncIterator
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
-from langchain.chat_models import init_chat_model
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from src.core.config import Config
 from src.core.exceptions import NotFoundError
+from src.services.llm import ChatModel
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +16,7 @@ logger = logging.getLogger(__name__)
 class ChatService:
     def __init__(self, config: Config):
         self.config = config
-        os.environ["OPENAI_API_KEY"] = config.OPENAI_API_KEY or ""
-        self.model = init_chat_model(config.OPENAI_MODEL_NAME)
+        self.model = ChatModel().create(config)
         self._mcp_client = MultiServerMCPClient(
             {
                 "kurious-tools": {
@@ -31,7 +29,9 @@ class ChatService:
     async def _load_tools(self) -> list[Any]:
         try:
             tools = await self._mcp_client.get_tools()
-            logger.info(f"Loaded {len(tools)} MCP tools from {self.config.MCP_SERVER_URL}")
+            logger.info(
+                f"Loaded {len(tools)} MCP tools from {self.config.MCP_SERVER_URL}"
+            )
             return tools
         except Exception as exc:
             logger.warning(f"Falling back to no tools. MCP load failed: {exc}")
@@ -69,7 +69,12 @@ class ChatService:
         return safe_value
 
     def _sanitize_tool_output(self, value: Any) -> Any:
-        if isinstance(value, list) and value and isinstance(value[0], dict) and "type" in value[0]:
+        if (
+            isinstance(value, list)
+            and value
+            and isinstance(value[0], dict)
+            and "type" in value[0]
+        ):
             return self._normalize_content(value)
         if hasattr(value, "content"):
             return self._normalize_content(getattr(value, "content", ""))
@@ -189,7 +194,9 @@ class ChatService:
                 if event_name == "on_tool_start":
                     run_id = str(event.get("run_id"))
                     tool_name = str(event.get("name") or "tool")
-                    tool_input = self._sanitize_tool_input(event.get("data", {}).get("input"))
+                    tool_input = self._sanitize_tool_input(
+                        event.get("data", {}).get("input")
+                    )
                     tool_runs[run_id] = {
                         "id": run_id,
                         "name": tool_name,
@@ -207,7 +214,9 @@ class ChatService:
                 if event_name == "on_tool_end":
                     run_id = str(event.get("run_id"))
                     tool_name = str(event.get("name") or "tool")
-                    output = self._sanitize_tool_output(event.get("data", {}).get("output"))
+                    output = self._sanitize_tool_output(
+                        event.get("data", {}).get("output")
+                    )
                     if run_id in tool_runs:
                         tool_runs[run_id]["output"] = output
                         tool_runs[run_id]["status"] = "completed"
@@ -228,7 +237,9 @@ class ChatService:
 
                 if event_name == "on_chain_end":
                     output = event.get("data", {}).get("output")
-                    if isinstance(output, dict) and isinstance(output.get("messages"), list):
+                    if isinstance(output, dict) and isinstance(
+                        output.get("messages"), list
+                    ):
                         messages = output["messages"]
                         if messages:
                             final_message = messages[-1]
