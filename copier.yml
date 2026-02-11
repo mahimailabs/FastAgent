@@ -11,10 +11,6 @@ _exclude:
   - "frontend/.env"
   - "frontend/node_modules"
   - "frontend/dist"
-  - "README.md"
-  - "backend/.env.example"
-  - "frontend/.env.example"
-  - "backend/pyproject.toml"
 
 project_name:
   type: str
