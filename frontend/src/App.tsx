@@ -81,7 +81,7 @@ const features: Feature[] = [
     icon: Bot,
     title: 'LangChain Agent',
     description:
-      'Pre-wired chat endpoint with create_react_agent. Plug in your tools and go.',
+      'Pre-wired chat endpoint with langchain agent. Plug in your tools and go.',
     accent: 'from-[#7f56d9] to-[#5f64ff]',
   },
   {
